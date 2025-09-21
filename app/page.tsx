@@ -10,7 +10,7 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-warm">
+    <div className="flex min-h-screen items-center justify-center bg-orange-100">
       <div className="text-center space-y-8 p-8">
         <div className="space-y-4">
           <div className="w-20 h-20 mx-auto bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 rounded-full flex items-center justify-center civic-shadow">

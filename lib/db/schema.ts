@@ -2,13 +2,14 @@ import {
   pgTable,
   text,
   timestamp,
-  serial,
+  uuid,
   pgEnum,
   integer,
   primaryKey,
   decimal,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+
 
 // ---------------- Enums ----------------
 
@@ -36,11 +37,16 @@ export const reportCategoryEnum = pgEnum("report_category", [
  * Stores core user information linked to Clerk authentication.
  */
 export const users = pgTable("users", {
-  id: text("id").primaryKey(), // Clerk User ID
+  id: uuid("id").defaultRandom().primaryKey(), // Clerk User ID
   name: text("name"),
   email: text("email").notNull().unique(),
   imageUrl: text("image_url"), // URL for the user's avatar
   createdAt: timestamp("created_at").defaultNow().notNull(),
+
+  // Location
+  latitude: decimal("latitude", { precision: 9, scale: 6 }),   // optional
+  longitude: decimal("longitude", { precision: 9, scale: 6 }), // optional
+  locationText: text("location_text"), // optional city/state or manual entry
 });
 
 /**
@@ -48,7 +54,7 @@ export const users = pgTable("users", {
  * The central table for all user-submitted posts/reports.
  */
 export const reports = pgTable("reports", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   description: text("description").notNull(),
   locationText: text("location_text"),
   latitude: decimal("latitude", { precision: 9, scale: 6 }),
