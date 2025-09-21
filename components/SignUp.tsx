@@ -1,26 +1,21 @@
 
+"use client";
 
-//app/(auth)/sign-up/[[...sign-up]]/page.tsx (Clerk Integration) 
-"use client "
 import { useState } from "react";
-import { useSignUp } from "@clerk/nextjs";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { userSignUpschema, SignUpFormData } from "../schema/userSignUpschema"; 
+
 import Link from "next/link";
 
 export default function SignUpPage() {
-  const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -28,108 +23,77 @@ export default function SignUpPage() {
   const [verificationError, setVerificationError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
+  const { register, handleSubmit, formState: { errors } } = useForm<SignUpFormData>({
+    resolver: zodResolver(userSignUpschema),
+  });
 
-  // Email/Password signup with Clerk
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isLoaded) return;
-
+  // Email/Password signup
+  const onSubmit = async (data: SignUpFormData) => {
     setIsSubmitting(true);
     setAuthError(null);
 
     try {
-      // Create the sign-up
-      await signUp.create({
-        firstName: formData.name.split(' ')[0] || formData.name,
-        lastName: formData.name.split(' ').slice(1).join(' ') || '',
-        emailAddress: formData.email,
-        password: formData.password,
-      });
-
-      // Start email verification process
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      // Simulate API call - replace with actual implementation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock success - replace with actual Clerk logic
+      console.log("Sign up data:", data);
       setVerifying(true);
       
     } catch (err: any) {
-      console.error("Sign-up error:", err);
-      setAuthError(err.errors?.[0]?.message || "Sign-up failed. Please try again.");
+      setAuthError(err.message || "Sign-up failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Email verification with Clerk
+  // Email verification
   const handleVerificationSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isLoaded) return;
-
     setIsSubmitting(true);
     setVerificationError(null);
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code: verificationCode,
-      });
-
-      if (completeSignUp.status === "complete") {
-        await setActive({ session: completeSignUp.createdSessionId });
-        router.push("/location"); // Redirect to location setup after successful signup
+      // Simulate verification - replace with actual implementation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (verificationCode.length === 6) {
+        router.push("/dashboard");
+      } else {
+        setVerificationError("Please enter a valid 6-digit code.");
       }
     } catch (err: any) {
-      console.error("Verification error:", err);
-      setVerificationError(err.errors?.[0]?.message || "Verification failed. Try again.");
+      setVerificationError(err.message || "Verification failed. Try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Social signup with Clerk
-  const handleSocialSignUp = async (provider: "oauth_google" | "oauth_facebook") => {
-    if (!isLoaded) return;
-
+  // Social signup
+  const handleSocialSignUp = async (provider: "google" | "facebook") => {
     setIsSubmitting(true);
     setAuthError(null);
 
     try {
-      await signUp.authenticateWithRedirect({
-        strategy: provider,
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/location",
-      });
+      // Simulate social signup - replace with actual implementation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log(`${provider} signup initiated`);
+      
     } catch (err: any) {
-      console.error("Social sign-up error:", err);
-      setAuthError(err.errors?.[0]?.message || "Social signup failed. Try again.");
+      setAuthError(err.message || "Social signup failed. Try again.");
+    } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Loading state
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-gradient-warm flex items-center justify-center p-4">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Verification step
   if (verifying) {
     return (
-      <div className="min-h-screen bg-gradient-warm flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold font-display">Check your email</CardTitle>
-            <CardDescription className="font-primary">
-              We sent a verification code to {formData.email}
+            <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+            <CardDescription>
+              We sent a verification code to your email address
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -142,7 +106,7 @@ export default function SignUpPage() {
             
             <form onSubmit={handleVerificationSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="verificationCode" className="font-primary">Verification Code</Label>
+                <Label htmlFor="verificationCode">Verification Code</Label>
                 <Input
                   id="verificationCode"
                   type="text"
@@ -150,26 +114,17 @@ export default function SignUpPage() {
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   maxLength={6}
-                  className="text-center text-lg tracking-widest font-mono"
+                  className="text-center text-lg tracking-widest"
                 />
               </div>
               
               <Button 
                 type="submit" 
-                className="btn-primary w-full h-12" 
+                className="w-full bg-orange-500 hover:bg-orange-600" 
                 disabled={isSubmitting || verificationCode.length !== 6}
               >
                 {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {isSubmitting ? "Verifying..." : "Verify Email"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => setVerifying(false)}
-              >
-                ← Back to sign up
               </Button>
             </form>
           </CardContent>
@@ -178,9 +133,8 @@ export default function SignUpPage() {
     );
   }
 
-  // Main sign-up form
   return (
-    <div className="min-h-screen bg-gradient-warm flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center mb-4">
@@ -192,11 +146,11 @@ export default function SignUpPage() {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <span className="ml-2 text-sm text-muted-foreground font-primary">Civic Sethu - Sign Up</span>
+            <span className="ml-2 text-sm text-muted-foreground">Civic Sethu - User Sign Up</span>
           </div>
           
-          <CardTitle className="text-2xl font-bold font-display">Create your account</CardTitle>
-          <CardDescription className="font-primary">
+          <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
+          <CardDescription>
             Join us and make your voice heard.
           </CardDescription>
         </CardHeader>
@@ -209,50 +163,47 @@ export default function SignUpPage() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name Field */}
             <div className="space-y-2">
-              <Label htmlFor="name" className="font-primary">Full Name</Label>
               <Input
-                id="name"
-                name="name"
                 type="text"
-                placeholder="Enter your full name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="w-full font-primary"
+                placeholder="Name"
+                {...register("name")}
+                className={`w-full ${errors.name ? 'border-red-300 focus:border-red-500' : ''}`}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-primary">Email Address</Label>
               <Input
-                id="email"
-                name="email"
                 type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full font-primary"
+                placeholder="Email or Phone Number"
+                {...register("email")}
+                className={`w-full ${errors.email ? 'border-red-300 focus:border-red-500' : ''}`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="font-primary">Password</Label>
               <div className="relative">
                 <Input
-                  id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full pr-10 font-primary"
+                  placeholder="Password"
+                  {...register("password")}
+                  className={`w-full pr-10 ${errors.password ? 'border-red-300 focus:border-red-500' : ''}`}
                 />
                 <Button
                   type="button"
@@ -268,14 +219,17 @@ export default function SignUpPage() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground font-primary">
-                Password must be at least 8 characters long
-              </p>
+              {errors.password && (
+                <p className="text-red-500 text-sm flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" />
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             <Button 
               type="submit" 
-              className="btn-primary w-full h-12 font-semibold" 
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white" 
               disabled={isSubmitting}
             >
               {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -287,19 +241,19 @@ export default function SignUpPage() {
           <div className="space-y-3">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
+                <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground font-primary">Or sign up with</span>
+                <span className="bg-background px-2 text-muted-foreground">Or sign up with</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                onClick={() => handleSocialSignUp("oauth_google")}
+                onClick={() => handleSocialSignUp("google")}
                 disabled={isSubmitting}
-                className="w-full font-primary"
+                className="w-full"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
                   <path
@@ -324,9 +278,9 @@ export default function SignUpPage() {
               
               <Button
                 variant="outline"
-                onClick={() => handleSocialSignUp("oauth_facebook")}
+                onClick={() => handleSocialSignUp("facebook")}
                 disabled={isSubmitting}
-                className="w-full font-primary"
+                className="w-full"
               >
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -338,9 +292,9 @@ export default function SignUpPage() {
 
           {/* Sign In Link */}
           <div className="text-center">
-            <span className="text-sm text-muted-foreground font-primary">
+            <span className="text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/sign-in" className="text-primary hover:text-primary/80 font-medium">
+              <Link href="/sign-in" className="text-orange-500 hover:text-orange-600 font-medium">
                 Sign In
               </Link>
             </span>

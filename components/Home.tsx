@@ -1,4 +1,4 @@
-// ===== app/page.tsx (Home Page) =====
+//components/Home.tsx
 "use client";
 
 import Link from "next/link";
@@ -14,7 +14,7 @@ export default function HomePage() {
       <div className="text-center space-y-8 p-8">
         <div className="space-y-4">
           <div className="w-20 h-20 mx-auto bg-gradient-to-r from-orange-500 via-orange-400 to-yellow-400 rounded-full flex items-center justify-center civic-shadow">
-            <FaPeopleLine size="2xl" className="text-white" />
+            <FaPeopleLine name="groups" size="4xl" className="text-white" />
           </div>
           <h1 className="text-4xl font-bold text-foreground font-display">
             Welcome to Civic Sethu
