@@ -1,0 +1,28 @@
+// You can place this in a constants file, e.g., src/lib/constants/districts.ts
+
+export const jharkhandDistricts = [
+  { id: "BOK", name: "Bokaro" },
+  { id: "CHA", name: "Chatra" },
+  { id: "DEO", name: "Deoghar" },
+  { id: "DHA", name: "Dhanbad" },
+  { id: "DUM", name: "Dumka" },
+  { id: "EAS", name: "East Singhbhum" },
+  { id: "GAR", name: "Garhwa" },
+  { id: "GIR", name: "Giridih" },
+  { id: "GOD", name: "Godda" },
+  { id: "GUM", name: "Gumla" },
+  { id: "HAZ", name: "Hazaribagh" },
+  { id: "JAM", name: "Jamtara" },
+  { id: "KHU", name: "Khunti" },
+  { id: "KOD", name: "Koderma" },
+  { id: "LAT", name: "Latehar" },
+  { id: "LOH", name: "Lohardaga" },
+  { id: "PAK", name: "Pakur" },
+  { id: "PAL", name: "Palamu" },
+  { id: "RAM", name: "Ramgarh" },
+  { id: "RAN", name: "Ranchi" },
+  { id: "SAH", name: "Sahebganj" },
+  { id: "SAR", name: "Seraikela Kharsawan" },
+  { id: "SIM", name: "Simdega" },
+  { id: "WES", name: "West Singhbhum" },
+];
